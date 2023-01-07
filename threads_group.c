@@ -6,7 +6,7 @@
 
 #include "threads_group.h"
 
-struct threads_group_parameters;
+struct threads_group_param;
 
 typedef struct threads_group
 {
@@ -14,17 +14,17 @@ typedef struct threads_group
     unsigned int real_threads_num;  // number of real threads created successfully
     pthread_t   *tids;
 
-    struct threads_group_parameters *param;
+    struct threads_group_param *param;
 
     threads_group_func_t func;
     void *arg;  // argument for func
 } threads_group_t;
 
-typedef struct threads_group_parameters
+typedef struct threads_group_param
 {
     threads_group_t *group;
     unsigned int     thread_id;
-} threads_group_parameters_t;
+} threads_group_param_t;
 
 
 void threads_group_wait_stop(void *threads_group)
@@ -37,7 +37,7 @@ void threads_group_wait_stop(void *threads_group)
 	}
 }
 
-void *thread_for_group(threads_group_parameters_t *arg)
+void *thread_for_group(threads_group_param_t *arg)
 {
     threads_group_t *group = arg->group;
 
@@ -70,7 +70,7 @@ void *threads_group_start(unsigned int threads_num, threads_group_func_t func, v
     group->arg = arg;
     group->threads_num = threads_num;
 
-    threads_group_parameters_t *param = (threads_group_parameters_t *)malloc(threads_num * sizeof(threads_group_parameters_t));
+    threads_group_param_t *param = (threads_group_param_t *)malloc(threads_num * sizeof(threads_group_param_t));
     if (param == NULL)
     {
         return NULL;
