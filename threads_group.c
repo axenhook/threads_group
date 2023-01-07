@@ -57,7 +57,7 @@ void *threads_group_start(unsigned int threads_num, threads_group_func_t func, v
     memset(tids, 0, threads_num * sizeof(pthread_t));
 
 
-    threads_group_t *group = malloc(sizeof(threads_group_t));
+    threads_group_t *group = (threads_group_t *)malloc(sizeof(threads_group_t));
     if (group == NULL)
     {
         free(tids);
