@@ -29,7 +29,8 @@ static void os_thread_destroy(os_thread_t tid, unsigned int force)
 {
 	if (force)
 	{
-		TerminateThread(tid, 0);
+		//TerminateThread(tid, 0);
+		CloseHandle(tid);
 	}
 }
 

@@ -23,14 +23,14 @@ void *thread_test(void *arg, unsigned int thread_id)
     {
         if (g_exit_flag)
         {
-            printf("The exit flag cached. [thread: %lu]\n", os_get_thread_id());
+            printf("The exit flag catched. [thread: %lu]\n", os_get_thread_id());
             break;
         }
 
         printf("The thread is running. [thread_id: %u, arg: %u, cnt: %d, thread: %lu]\n",
                thread_id, ((unsigned int *)arg)[thread_id], cnt++, os_get_thread_id());
 
-		os_sleep_ms(100);
+		os_sleep_ms(200);
     }
 
     printf("The thread stopped. [thread_id: %u, cnt: %d, thread: %lu]\n",
@@ -57,12 +57,12 @@ int main(int argc, char *argv[])
 
     void *group = threads_group_start(10, thread_test, arg, "test_threads_group");
 	os_sleep_ms(5*1000);
-	threads_group_stop(group, 0);
-	//os_sleep_ms(5*1000);
+	trigger_stop(1);
+	threads_group_stop(group, 1);
 
     printf("test threads group finished. [thread: %lu]\n", os_get_thread_id());
 
-	//system("pause");
+	system("pause");
 
     return 0;
 }

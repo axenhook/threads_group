@@ -18,7 +18,7 @@
 #include <pthread.h>
 
 #define os_get_thread_id()               ((unsigned long)pthread_self())
-#define os_sleep_ms(x)                   usleep((x) * 1000)
+#define os_sleep_ms(x)                   Sleep(x) // usleep((x) * 1000)
 
 #endif
 
