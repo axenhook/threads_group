@@ -10,31 +10,30 @@ struct threads_group_param;
 
 typedef struct threads_group
 {
-    unsigned int threads_num;       // number of threads wanted to be created
-    unsigned int real_threads_num;  // number of real threads created successfully
-    pthread_t   *tids;
+    unsigned int threads_num;      // number of threads wanted to be created
+    unsigned int real_threads_num; // number of real threads created successfully
+    pthread_t *tids;
 
     struct threads_group_param *param;
 
     threads_group_func_t func;
-    void *arg;  // argument for func
+    void *arg; // argument for func
 } threads_group_t;
 
 typedef struct threads_group_param
 {
     threads_group_t *group;
-    unsigned int     thread_id;
+    unsigned int thread_id;
 } threads_group_param_t;
-
 
 void threads_group_wait_stop(void *threads_group)
 {
     threads_group_t *group = (threads_group_t *)threads_group;
 
-	for (unsigned int i = 0; i < group->real_threads_num; i++)
-	{
-		pthread_join(group->tids[i], NULL);
-	}
+    for (unsigned int i = 0; i < group->real_threads_num; i++)
+    {
+        pthread_join(group->tids[i], NULL);
+    }
 }
 
 void *thread_for_group(threads_group_param_t *arg)
@@ -55,7 +54,6 @@ void *threads_group_start(unsigned int threads_num, threads_group_func_t func, v
     }
 
     memset(tids, 0, threads_num * sizeof(pthread_t));
-
 
     threads_group_t *group = (threads_group_t *)malloc(sizeof(threads_group_t));
     if (group == NULL)
@@ -84,19 +82,18 @@ void *threads_group_start(unsigned int threads_num, threads_group_func_t func, v
 
     group->param = param;
 
-	for (unsigned int i = 0; i < threads_num; i++)
-	{
+    for (unsigned int i = 0; i < threads_num; i++)
+    {
         pthread_t tid;
-		int ret = pthread_create(&tid, NULL, (void * (*)(void *))thread_for_group, &group->param[i]);
-		if (ret != 0)
-		{
-			break;
-		}
+        int ret = pthread_create(&tid, NULL, (void *(*)(void *))thread_for_group, &group->param[i]);
+        if (ret != 0)
+        {
+            break;
+        }
 
         group->tids[i] = tid;
         group->real_threads_num++;
-	}
+    }
 
     return group;
 }
-
