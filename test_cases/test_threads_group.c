@@ -24,8 +24,8 @@ void *thread_test(void *arg, unsigned int thread_id)
             break;
         }
 
-        printf("The thread is running. [thread_id: %u, cnt: %d, thread: %lu]\n",
-               thread_id, cnt++, (unsigned long)pthread_self());
+        printf("The thread is running. [thread_id: %u, arg: %u, cnt: %d, thread: %lu]\n",
+               thread_id, ((unsigned int *)arg)[thread_id], cnt++, (unsigned long)pthread_self());
 
         usleep(100 * 1000);
     }
@@ -45,8 +45,14 @@ int main(int argc, char *argv[])
     signal(SIGTERM, trigger_stop);
 
     printf("start threads group. [thread: %lu]\n", (unsigned long)pthread_self());
+    
+    unsigned int arg[10] = {0};
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        arg[i] = i + 100;
+    }
 
-    void *group = threads_group_start(10, thread_test, NULL);
+    void *group = threads_group_start(10, thread_test, arg);
     threads_group_wait_stop(group);
 
     printf("finish threads group. [thread: %lu]\n", (unsigned long)pthread_self());
