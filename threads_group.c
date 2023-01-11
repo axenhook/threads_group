@@ -19,6 +19,8 @@ typedef HANDLE                      os_thread_t;
 
 #define INVALID_TID                 NULL
 
+#define atomic_inc(x)               InterlockedIncrement(x)
+#define os_sleep_ms(x)              Sleep(x)
 
 static os_thread_t os_thread_create(void *(*func)(void *), void *para, const char *thread_name)
 {
@@ -43,6 +45,8 @@ typedef pthread_t                   os_thread_t;
 
 #define INVALID_TID                 0
 
+#define atomic_inc(x)                __sync_fetch_and_add(x, 1)
+#define os_sleep_ms(x)               Sleep(x) // usleep((x) * 1000)
 
 static inline os_thread_t os_thread_create(void *(*func)(void *), void *para, const char *thread_name)
 {
@@ -77,6 +81,7 @@ typedef struct threads_group
 {
     unsigned int threads_num;      // number of threads wanted to be created
     unsigned int real_threads_num; // number of real threads created successfully
+	unsigned int exit_threads_num; // number of thread exit
 	os_thread_t *tids;
 
     struct threads_group_param *param;
@@ -95,6 +100,11 @@ void threads_group_stop(void *threads_group, unsigned int is_force)
 {
     threads_group_t *group = (threads_group_t *)threads_group;
 
+	while (group->exit_threads_num < group->real_threads_num)
+	{
+		os_sleep_ms(500);
+	}
+
     for (unsigned int i = 0; i < group->real_threads_num; i++)
     {
 		os_thread_destroy(group->tids[i], is_force);
@@ -106,6 +116,7 @@ void *thread_for_group(threads_group_param_t *arg)
     threads_group_t *group = arg->group;
 
     group->func(group->arg, arg->thread_id);
+	atomic_inc(&group->exit_threads_num);
 
     return NULL;
 }
