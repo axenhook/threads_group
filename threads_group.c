@@ -20,6 +20,8 @@ typedef HANDLE                      os_thread_t;
 #define INVALID_TID                 NULL
 
 #define atomic_inc(x)               InterlockedIncrement(x)
+#define atomic_read(x)              (*(x))
+
 #define os_sleep_ms(x)              Sleep(x)
 
 static os_thread_t os_thread_create(void *(*func)(void *), void *para, const char *thread_name)
@@ -45,7 +47,9 @@ typedef pthread_t                   os_thread_t;
 
 #define INVALID_TID                 0
 
-#define atomic_inc(x)                __sync_fetch_and_add(x, 1)
+#define atomic_inc(x)               __sync_fetch_and_add(x, 1)
+#define atomic_read(x)              (*(x))
+
 #define os_sleep_ms(x)               Sleep(x) // usleep((x) * 1000)
 
 static inline os_thread_t os_thread_create(void *(*func)(void *), void *para, const char *thread_name)
@@ -100,7 +104,7 @@ void threads_group_stop(void *threads_group, unsigned int is_force)
 {
     threads_group_t *group = (threads_group_t *)threads_group;
 
-	while (group->exit_threads_num < group->real_threads_num)
+	while (atomic_read(&group->exit_threads_num) < group->real_threads_num)
 	{
 		os_sleep_ms(500);
 	}
